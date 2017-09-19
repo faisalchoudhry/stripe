@@ -5,7 +5,7 @@
 // See your keys here: https://dashboard.stripe.com/account/apikeys
 
 var express = require("express");
-var stripe = require("stripe")("sk_test_QpO6f3ESy6hfbGzKzdVwrbBx");
+//var stripe = require("stripe")("sk_test_QpO6f3ESy6hfbGzKzdVwrbBx");
 var hbs = require("hbs");
 var bodyParser = require("body-parser");
 var http = require("http");
