@@ -8,7 +8,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 <!--Wrapper-->
@@ -103,17 +102,7 @@
                     <!--<input type="submit" value="submit" id="btn_card_info" class="btn btn-default"/>-->
                     <!--</div>-->
                     <!--</div>-->
-                    <script
-                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                            data-key="pk_test_HBUY6uUd8f24PGoEe66UAZtW"
-                            data-amount="10000"
-                            data-name="Demo Site"
-                            data-description="Widget"
-                            data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-                            data-locale="auto"
-                            data-currency="usd">
-                    </script>
-                    <input type="hidden" name="chargeAmount" value="9999">
+                    
                 </form>
             </div>
 
@@ -127,97 +116,6 @@
     </div>
 
 </div>
-<script>
-    $('.stripe-button-el').css('margin-left', '17%');
 
-    //Customer List
-    $.get('/customerList', function (data) {
-        console.log(data);
-        fillCustomerJsonRow(data);
-        var customer_length = data.data.length;
-//        for (var i = 0; i < customer_length; i++) {
-//            console.log(i + "->" + data.data[i].id + i + "->" + data.data[i].email + +"->" + data.data[i].metadata.compName + i
-//                    + "->" + data.data[i].sources.data[0].brand + "->" + data.data[i].sources.data[0].customer + "->" +
-//                    data.data[i].sources.data[0].exp_month
-//                    + "->" + data.data[i].sources.data[0].exp_year + "->" + data.data[i].sources.data[0].last4)
-//        }
-    });
-
-    //Approved Accounts List
-    $.get('/approvedAccountList', function (carges) {
-        console.log("Payed Accounts:" + carges);
-    });
-
-    function fillCustomerJsonRow(data) {
-        try {
-            var headers = [
-                "id",
-                "Email",
-                "Company Name",
-                "Name",
-                "Number",
-                "Brand",
-                "Customer",
-                "Exp Month",
-                "Exp Year",
-                "Last4",
-                "State",
-                "Action"
-            ];
-            var innerHtmlPopupTableHeaders = setCustomerTableHeaders(headers, customer_table);
-            var innerHtmlPopupTableBody = setCustomerTableBody(data);
-            customer_table.innerHTML = innerHtmlPopupTableHeaders + innerHtmlPopupTableBody; //Create Numbers Data Table
-        }
-        catch (err) {
-            customer_table.innerHTML = "No Record To Show";
-        }
-    }
-
-    //Number Table Header
-    function setCustomerTableHeaders(headers, customer_table) {
-        customer_table.innerHTML = "";
-        var innerHtmlTable = "<table class='table table-hover table-responsive'>" +
-                "<thead style='border:1px solid; background:#F8B74B; color:white'>" +
-                "<tr>";
-        for (var i = 0; i < headers.length; i++) {
-            innerHtmlTable += "<th>" + headers[i] + "</th>";
-        }
-        ;
-        innerHtmlTable += "</tr></thead>";
-        return innerHtmlTable;
-    }
-
-    //Number Table Body
-    function setCustomerTableBody(data) {
-        var tbodyHtml = "<tbody>";
-        var customer_length = data.data.length;
-        for (var i = 0; i < customer_length; i++) {
-            tbodyHtml += "<tr><td>" + data.data[i].sources.data[0].id + "</td>";
-            tbodyHtml += "<td>" + data.data[i].email + "</td>";
-            tbodyHtml += "<td>" + data.data[i].metadata.compName + "</td>";
-            tbodyHtml += "<td>" + data.data[i].metadata.name + "</td>";
-            tbodyHtml += "<td>" + data.data[i].metadata.number + "</td>";
-            tbodyHtml += "<td>" + data.data[i].sources.data[0].brand + "</td>";
-            tbodyHtml += "<td>" + data.data[i].sources.data[0].customer + "</td>";
-            tbodyHtml += "<td>" + data.data[i].sources.data[0].exp_month + "</td>";
-            tbodyHtml += "<td>" + data.data[i].sources.data[0].exp_year + "</td>";
-            tbodyHtml += "<td>" + data.data[i].sources.data[0].last4 + "</td>";
-            tbodyHtml += "<td id='" + data.data[i].id + "' style='color: cornflowerblue'> Reviewed </td>";
-            tbodyHtml += "<td style='border:1px solid #7CB5EC;cursor:pointer'' id='" + data.data[i].id + "' " +
-                    "onclick='customerApproval(this.id)'><div class='btn btn-primary'>Approve</div></td></tr>";
-        }
-        tbodyHtml += "</tbody></table>";
-        return tbodyHtml;
-    }
-
-    //Customer Payment Approval Here
-    function customerApproval(token) {
-        var parameters = {token: token, card: "card_1Aw6mOIzulKKd4cqwPGCfe9t"};
-        $.get('/customerApproval', parameters, function (data) {
-            $("#" + data.cusId).html('Approved');
-            $("#" + data.cusId).css('color', 'green');
-        });
-    }
-</script>
 </body>
 </html>
