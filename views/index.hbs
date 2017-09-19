@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stripe Test</title>
+    <!--Bootstrap/Jquery Link Here-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+<!--Wrapper-->
+<div class="wrapper">
+
+    <!--Navigation Here-->
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <ul class="nav navbar-nav">
+                <li role="presentation" class=" active"><a href="#card_info" role="tab" data-toggle="tab">Card Info</a>
+                </li>
+                <li role="presentation"><a href="#admin" role="tab" data-toggle="tab">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!--Main Container-->
+    <div class="container">
+        <div class="tab-content">
+            <!--Card Info Here-->
+            <div class="tab-pane fade in active" id="card_info">
+                <h1>Card Info</h1>
+                <!--form here-->
+                <form class="form-horizontal" method="post" action="/index" id="form_card">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="company_name">Company Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="company_name" id="company_name"
+                                   placeholder="Company Name"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="name">Name:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Enter name"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="number">Number:</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" name="number" id="number"
+                                   placeholder="Enter number" required>
+                        </div>
+                    </div>
+                    <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="email">Email</label>-->
+                    <!--<div class="col-sm-10">-->
+                    <!--<input type="email" class="form-control" name="email" id="email" placeholder="Email"-->
+                    <!--required>-->
+                    <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="card_number">Credit Card Number</label>-->
+                    <!--<div class="col-sm-10">-->
+                    <!--<input type="number" class="form-control" data-stripe="number" name="card_number"-->
+                    <!--id="card_number" placeholder="credit card number"-->
+                    <!--required>-->
+                    <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="cvc">CVC</label>-->
+                    <!--<div class="col-sm-10">-->
+                    <!--<input type="number" class="form-control" data-stripe="cvc" name="cvc" id="cvc"-->
+                    <!--placeholder="CVC"-->
+                    <!--required>-->
+                    <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="month">Expire Month</label>-->
+                    <!--<div class="col-sm-10">-->
+                    <!--<input type="number" class="form-control" name="month" data-stripe="exp-month" id="month"-->
+                    <!--placeholder="MM"-->
+                    <!--required>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="year">Expire Year</label>-->
+                    <!--<div class="col-sm-10">-->
+                    <!--<input type="number" class="form-control" name="year" data-stripe="exp-year" id="year"-->
+                    <!--placeholder="YY"-->
+                    <!--required>-->
+                    <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="form-group">-->
+                    <!--<div class="col-sm-offset-2 col-sm-10">-->
+                    <!--<input type="submit" value="submit" id="btn_card_info" class="btn btn-default"/>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <script
+                            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                            data-key="pk_test_HBUY6uUd8f24PGoEe66UAZtW"
+                            data-amount="10000"
+                            data-name="Demo Site"
+                            data-description="Widget"
+                            data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                            data-locale="auto"
+                            data-currency="usd">
+                    </script>
+                    <input type="hidden" name="chargeAmount" value="9999">
+                </form>
+            </div>
+
+            <!--Add New Event Here-->
+            <div class="tab-pane fade" id="admin">
+                <h1>Admin</h1>
+                <h3>Pending Payment Approval</h3>
+                <div id="customer_table"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    $('.stripe-button-el').css('margin-left', '17%');
+
+    //Customer List
+    $.get('/customerList', function (data) {
+        console.log(data);
+        fillCustomerJsonRow(data);
+        var customer_length = data.data.length;
+//        for (var i = 0; i < customer_length; i++) {
+//            console.log(i + "->" + data.data[i].id + i + "->" + data.data[i].email + +"->" + data.data[i].metadata.compName + i
+//                    + "->" + data.data[i].sources.data[0].brand + "->" + data.data[i].sources.data[0].customer + "->" +
+//                    data.data[i].sources.data[0].exp_month
+//                    + "->" + data.data[i].sources.data[0].exp_year + "->" + data.data[i].sources.data[0].last4)
+//        }
+    });
+
+    //Approved Accounts List
+    $.get('/approvedAccountList', function (carges) {
+        console.log("Payed Accounts:" + carges);
+    });
+
+    function fillCustomerJsonRow(data) {
+        try {
+            var headers = [
+                "id",
+                "Email",
+                "Company Name",
+                "Name",
+                "Number",
+                "Brand",
+                "Customer",
+                "Exp Month",
+                "Exp Year",
+                "Last4",
+                "State",
+                "Action"
+            ];
+            var innerHtmlPopupTableHeaders = setCustomerTableHeaders(headers, customer_table);
+            var innerHtmlPopupTableBody = setCustomerTableBody(data);
+            customer_table.innerHTML = innerHtmlPopupTableHeaders + innerHtmlPopupTableBody; //Create Numbers Data Table
+        }
+        catch (err) {
+            customer_table.innerHTML = "No Record To Show";
+        }
+    }
+
+    //Number Table Header
+    function setCustomerTableHeaders(headers, customer_table) {
+        customer_table.innerHTML = "";
+        var innerHtmlTable = "<table class='table table-hover table-responsive'>" +
+                "<thead style='border:1px solid; background:#F8B74B; color:white'>" +
+                "<tr>";
+        for (var i = 0; i < headers.length; i++) {
+            innerHtmlTable += "<th>" + headers[i] + "</th>";
+        }
+        ;
+        innerHtmlTable += "</tr></thead>";
+        return innerHtmlTable;
+    }
+
+    //Number Table Body
+    function setCustomerTableBody(data) {
+        var tbodyHtml = "<tbody>";
+        var customer_length = data.data.length;
+        for (var i = 0; i < customer_length; i++) {
+            tbodyHtml += "<tr><td>" + data.data[i].sources.data[0].id + "</td>";
+            tbodyHtml += "<td>" + data.data[i].email + "</td>";
+            tbodyHtml += "<td>" + data.data[i].metadata.compName + "</td>";
+            tbodyHtml += "<td>" + data.data[i].metadata.name + "</td>";
+            tbodyHtml += "<td>" + data.data[i].metadata.number + "</td>";
+            tbodyHtml += "<td>" + data.data[i].sources.data[0].brand + "</td>";
+            tbodyHtml += "<td>" + data.data[i].sources.data[0].customer + "</td>";
+            tbodyHtml += "<td>" + data.data[i].sources.data[0].exp_month + "</td>";
+            tbodyHtml += "<td>" + data.data[i].sources.data[0].exp_year + "</td>";
+            tbodyHtml += "<td>" + data.data[i].sources.data[0].last4 + "</td>";
+            tbodyHtml += "<td id='" + data.data[i].id + "' style='color: cornflowerblue'> Reviewed </td>";
+            tbodyHtml += "<td style='border:1px solid #7CB5EC;cursor:pointer'' id='" + data.data[i].id + "' " +
+                    "onclick='customerApproval(this.id)'><div class='btn btn-primary'>Approve</div></td></tr>";
+        }
+        tbodyHtml += "</tbody></table>";
+        return tbodyHtml;
+    }
+
+    //Customer Payment Approval Here
+    function customerApproval(token) {
+        var parameters = {token: token, card: "card_1Aw6mOIzulKKd4cqwPGCfe9t"};
+        $.get('/customerApproval', parameters, function (data) {
+            $("#" + data.cusId).html('Approved');
+            $("#" + data.cusId).css('color', 'green');
+        });
+    }
+</script>
+</body>
+</html>
